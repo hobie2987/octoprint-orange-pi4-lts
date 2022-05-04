@@ -1,6 +1,6 @@
 [Unit]
 Description=Camera streamer for OctoPrint
-After=network-online.target octoprint.service
+After=network-online.target OctoPrint.service
 Wants=network-online.target
 
 [Service]
