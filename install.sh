@@ -1,7 +1,7 @@
 #!/bin/bash
 #set -x #echo on
 
-## Run system Updates
+# Run system Updates
 function sys_update() {
   echo 'Lets make sure your system is updated, shall we?...'
   sudo apt-get update
@@ -46,7 +46,7 @@ function webcam_support() {
   git clone https://github.com/jacksonliam/mjpg-streamer.git
   cd mjpg-streamer/mjpg-streamer-experimental
   export LD_LIBRARY_PATH=.
-  make
+  sudo make
   cd /home/pi
   mkdir scripts
   cd scripts
@@ -54,20 +54,20 @@ function webcam_support() {
 # TODO enable reading in of resolution and updating webcam daemon script
 # read -p "Would resolution is your webcam? [1920x1080]" -i Y resolution
 # read -p "Would is the frame rate of your webcam? [30]" -i Y frame_rate
-  echo 'Install webcam auto-start scripts...'
+  echo 'Installing webcam auto-start scripts...'
   wget https://raw.githubusercontent.com/hobie2987/octoprint-orange-pi4-lts/main/scripts/webcamd
   echo 'Updating script permissions...'
   sudo chmod +x /home/pi/scripts/webcamd
   echo 'Install webcam services...'
   wget https://raw.githubusercontent.com/hobie2987/octoprint-orange-pi4-lts/main/services/webcamd.service && sudo mv webcamd.service /etc/systemd/system/webcamd.service
-  sudo systemctl daemon-reload
   sudo systemctl enable webcamd.service
+  sudo systemctl daemon-reload
   sudo systemctl start webcamd
   echo 'Webcam services installed!...'
 }
 
 function set_permissions() {
-  echo 'Lets set sme permissions for user pi...'
+  echo 'Lets set some permissions for user pi...'
   #read -n 1 -p "Would you like to disable password for user pi? [y,n]: " -i Y nopass
   #if [ "$nopass" == "y" ]; then
     echo 'pi ALL=(ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers
@@ -80,9 +80,9 @@ function set_permissions() {
 function fin() {
   echo 'OctoPrint is now installed with webcam support!  Please reboot your Orange Pi!'
   echo '-------------------------------------------------------------------------------'
-  hostname = $(hostname -I)
-  echo 'OctoPrint is running @: ${hostname}:5000';
-  echo 'Webcam stream is running @: ${hostname}:8080?action=stream';
+  hostname=$(hostname -I | cut -d" " -f1)
+  echo OctoPrint is running @: http://${hostname}:5000/
+  echo Webcam stream is running @: http://${hostname}:8080/?action=stream
   echo '-------------------------------------------------------------------------------'
 }
 
