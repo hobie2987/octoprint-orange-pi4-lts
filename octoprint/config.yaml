@@ -1,0 +1,19 @@
+webcam:
+  stream: http://ip_address:8080/?action=stream
+  snapshot:  http://127.0.0.1:8080/?action=snapshot
+  ffmpeg: /usr/bin/ffmpeg
+server:
+  commands:
+    systemShutdownCommand: sudo shutdown -h now
+    systemRestartCommand: sudo shutdown -r now
+    serverRestartCommand: sudo service octoprint restart
+system:
+  actions:
+    - action: streamon
+      command: sudo systemctl start webcamd
+      confirm: false
+      name: Start video stream
+    - action: streamoff
+      command: sudo systemctl stop webcamd
+      confirm: false
+      name: Stop video stream
