@@ -5,7 +5,7 @@ hostname=$(hostname -I | cut -d" " -f1)
 
 # Green text
 function INFO() {
-  echo -e "\e[1;32m$1\e[1;m"
+  echo -e "\e[1;35m$1\e[1;m"
 #  echo $1
 }
 
@@ -85,23 +85,10 @@ function webcam_support() {
   wget https://raw.githubusercontent.com/hobie2987/octoprint-orange-pi4-lts/main/scripts/webcamd
   INFO 'Updating script permissions...'
   sudo chmod +x /home/pi/scripts/webcamd
-  sudo chmod +x /dev/video0
+  sudo chmod 666 /dev/video0
   INFO 'Install webcam services...'
   wget https://raw.githubusercontent.com/hobie2987/octoprint-orange-pi4-lts/main/services/webcamd.service && sudo mv webcamd.service /etc/systemd/system/webcamd.service
   INFO 'Webcam services installed!...'
-}
-
-# Download config.yaml to set server and system actions
-# serverRestartCommand - sudo service octoprint restart
-# systemRestartCommand - sudo shutdown -r now
-# systemShutdownCommand - sudo shutdown -h now
-function octo_config_yaml() {
-  cd /home/pi/.octoprint
-  if [ -f "config.yaml" ]; then
-      WARN "config.yaml exists, backup: config.yaml -> og.config.yaml"
-      mv config.yaml og.config.yaml
-  fi
-  wget https://raw.githubusercontent.com/hobie2987/octoprint-orange-pi4-lts/main/octoprint/config.yaml
 }
 
 # Remove sudo password requirements for user pi
@@ -146,12 +133,13 @@ EOT
 }
 
 # Reload Daemon
-# Enable OctoPrint and Webcam services
-# Start OctoPrint and Webcam services
+# Enable OctoPrint, Webcam services
+# Start Reverse Proxy, OctoPrint, and Webcam services
 function start_services() {
   sudo systemctl daemon-reload
   sudo systemctl enable octoprint.service
   sudo systemctl enable webcamd.service
+  sudo service haproxy start
   sudo systemctl start octoprint
   sudo systemctl start webcamd
 }
@@ -163,13 +151,20 @@ function fin() {
   INFO 'OctoPrint is running @: http://'${hostname}/
   INFO 'Webcam stream is running @: http://'${hostname}/webcam/?action=stream
   INFO '-------------------------------------------------------------------------------'
+  INFO 'System commands'
+  INFO 'Restart OctoPrint: sudo service octoprint restart'
+  INFO 'Restart System: sudo shutdown -r now'
+  INFO 'Shutdown System: sudo shutdown -h now'
+  INFO '-------------------------------------------------------------------------------'
+  # serverRestartCommand - sudo service octoprint restart
+  # systemRestartCommand - sudo shutdown -r now
+  # systemShutdownCommand - sudo shutdown -h now
 }
 
 sys_update
 pi_user
 install_octoprint
 webcam_support
-#octo_config_yaml
 set_permissions
 reverse_proxy
 start_services
