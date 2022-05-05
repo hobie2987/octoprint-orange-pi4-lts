@@ -1,20 +1,18 @@
 #!/bin/bash
 #set -x #echo on
-#hostname=$(hostname -I | cut -d" " -f1)
+
+hostname=$(hostname -I | cut -d" " -f1)
 
 # Green text
 function INFO() {
   echo -e "\e[1;32m$1\e[1;m"
+#  echo $1
 }
 
 # Yellow text
 function WARN() {
   echo -e "\e[1;33m$1\e[1;m"
-}
-
-# Red text
-function ERROR() {
-  echo -e "\e[1;31m$1\e[1;m"
+  #  echo $1
 }
 
 # Run system Updates/Upgrades
