@@ -156,6 +156,11 @@ function fin() {
   INFO 'Restart System: sudo shutdown -r now'
   INFO 'Shutdown System: sudo shutdown -h now'
   INFO '-------------------------------------------------------------------------------'
+  INFO 'Webcam & Timelapse Settings'
+  INFO 'Stream URL: /webcam/?action=stream'
+  INFO 'Snapshot URL: http://127.0.0.1:8080/?action=snapshot'
+  INFO 'Path to FFMPEG: /usr/bin/ffmpeg'
+  INFO '-------------------------------------------------------------------------------'
   # serverRestartCommand - sudo service octoprint restart
   # systemRestartCommand - sudo shutdown -r now
   # systemShutdownCommand - sudo shutdown -h now
