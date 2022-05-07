@@ -58,6 +58,8 @@ function install_octoprint() {
   pip install octoprint
   INFO 'Installing OctoPrint auto-start scripts...'
   wget https://github.com/OctoPrint/OctoPrint/raw/master/scripts/octoprint.service && sudo mv octoprint.service /etc/systemd/system/octoprint.service
+  cd /home/pi
+  sudo chown -R pi OctoPrint
   INFO 'OctoPrint services installed!...'
 }
 
