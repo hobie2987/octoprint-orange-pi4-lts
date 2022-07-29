@@ -72,8 +72,10 @@ function install_octoprint() {
 function webcam_support() {
   cd /home/pi
   INFO 'Installing mjpg-streamer...'
-  sudo apt install subversion libjpeg62-turbo-dev imagemagick ffmpeg libv4l-dev cmake
+  #sudo apt install subversion libjpeg62-turbo-dev imagemagick ffmpeg libv4l-dev cmake
+  sudo apt install subversion libjpeg-dev imagemagick ffmpeg libv4l-dev cmake
   git clone https://github.com/jacksonliam/mjpg-streamer.git
+  # sudo chown -R pi mjpg-streamer
   cd mjpg-streamer/mjpg-streamer-experimental
   export LD_LIBRARY_PATH=.
   sudo make

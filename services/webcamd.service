@@ -5,7 +5,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=root
+User=pi
 ExecStart=/home/pi/scripts/webcamd
 
 [Install]
