@@ -30,12 +30,13 @@ function pi_user() {
     sudo adduser pi
     INFO 'Granting pi user sudo permissions...'
     sudo usermod -aG sudo pi
-    INFP 'Granting pi user serial port access...'
-    sudo usermod -a -G tty pi
-    sudo usermod -a -G dialout pi
   else
-    WARN 'pi user exists, but permissions might be incorrect'
+    WARN 'pi user exists, but permissions will be updated'
   fi
+
+  INFO 'Granting pi user serial port access...'
+  sudo usermod -a -G tty pi
+  sudo usermod -a -G dialout pi
 }
 
 # Download Python dependencies
