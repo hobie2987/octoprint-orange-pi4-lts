@@ -15,36 +15,41 @@ and automation reduces the chances of making a mistake, causing you to restart t
 - 8+ GB microSD card
   - I recommend Sandisk Ultra series (32GB)
     - https://www.amazon.com/dp/B08GY9NYRM
-- Fresh installation of Debian on microSD card
-  - Installation IMG files can be downloaded from here: http://www.orangepi.org/downloadresources/
-  - IMG files can be installed on a microSD card using Win32DiskImager
-    - https://sourceforge.net/projects/win32diskimager/
+- Fresh installation of Armbian on microSD card
+  - Installation IMG files can be downloaded from here: https://www.armbian.com/orange-pi-4-lts/
+  - IMG files can be installed on a microSD card using balenaEtcher
+    - https://www.balena.io/etcher/
 
 ## Installation instructions ##
-- Install Debian on your microSD card, and insert it into the side of the OPi4 board
+- Extract the Armbian installation image from the downloaded archive file
+- Install Armbian on your microSD card with balenaEtcher, and insert it into the side of the OPi4 board
 - Plug in your USB webcam, mouse and keyboard
 - The OPi4 LTS board is equipped with WiFi, so have your network password on hand, or plug it in directly to ethernet
 - Connect the OPi4 board to a display via an HDMI cable
-- Finally, plug in the 5v power adapter
+- Finally, plug in the 5v power adapter to power on the device
 
-### Once the OPi4 board has completed booting, and the desktop is loaded, perform the following actions: ###
-- Click on the network icon in the top menu bar, and select your preferred network ssid
-  - Enter the password for your network
-- Open a new terminal from the Application menu in the upper left-hand corner of your screen.  
+### Once the OPi4 board has completed booting, perform the following actions: ###
+- Create a password for root, and confirm password
+- Select your default shell
+  - Press 1 for "bash"
+- You will then be prompted to create a new sudo user. Use the following credentials
+  - User Name: pi (all lowercase)
+  - Password: your choice, but use something you'll remember
+- Select your Wifi network (if applicable)
+  - Select the SSID for your network
+  - Enter the password/passphrase, use the down arrow and press ENTER on OK
+  - Using your arrow keys, press right and then down to highlight "Quit", and hit Enter
+- Select Language and Locale
 - Type (or copy and paste) each of the commands below into the terminal, one by one, and pressing the Enter key on your 
 keyboard to submit the command.
 
 ```bash
-sudo su root
 cd ~
 wget https://raw.githubusercontent.com/hobie2987/octoprint-orange-pi4-lts/main/install.sh
 sudo bash ./install.sh
 ```
 
 ### The above commands perform the following actions ###
-- sudo su root - Switches the active terminal user from "orangepi" to "root"
-  - If prompted for a password, enter the following: orangepi 
-    - (Yes, the username and password are the same)
 - cd ~ - Change directory to the root user's home directory
 - wget https://... - This will download the install.sh script directly from GitHub
 - sudo bash ./install.sh - Executes the installation script with super-user privileges
@@ -96,7 +101,7 @@ sudo shutdown -r now
 
 ## Post install instructions ##
 
-Once your system has restarted, open a web browser from the application menu and enter the URL you copied from the 
+Once your system has restarted, open a web browser on another computer and enter the URL you copied from the 
 script output.  This should load the OctoPrint setup wizard.  During the setup process, there will be two steps for 
 providing system command and URL's for your webcam.  Use the values provided below:
 
