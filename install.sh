@@ -18,8 +18,8 @@ function WARN() {
 # Run system Updates/Upgrades
 function sys_update() {
   INFO 'Lets make sure your system is updated, shall we?...'
-  sudo apt-get update
-  sudo apt-get upgrade
+  sudo apt update
+  sudo apt upgrade
 }
 
 # Creates user "pi",
@@ -28,11 +28,15 @@ function pi_user() {
   if ! id -u 'pi' >/dev/null 2>&1; then
     INFO 'Creating sudo user: pi...'
     sudo adduser pi
-    INFO 'Granting pi user sudo permissions...'
-    sudo usermod -aG sudo pi
   else
     WARN 'pi user exists, but permissions will be updated'
   fi
+
+  INFO 'Granting pi user sudo permissions...'
+  sudo usermod -a -G sudo pi
+
+  INFO 'Granting pi user video permissions...'
+  sudo usermod -a -G video pi
 
   INFO 'Granting pi user serial port access...'
   sudo usermod -a -G tty pi
@@ -48,6 +52,7 @@ function install_octoprint() {
   python3 --version # Prints Python version
   sudo apt update
   sudo apt install python3-pip python3-dev python3-setuptools python3-venv git libyaml-dev build-essential
+  # sudo apt install libraspberrypi-bin ?????
   cd /home/pi
   mkdir -v OctoPrint
   cd OctoPrint
@@ -98,7 +103,7 @@ function webcam_support() {
 
 # Remove sudo password requirements for user pi
 function set_permissions() {
-  INFO 'Lets set some permissions for user pi...'
+  INFO 'Removing password requirement for user pi...'
 #    echo 'pi ALL=(ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers
 #    echo 'pi ALL=NOPASSWD: /sbin/shutdown' | sudo tee -a /etc/sudoers.d/octoprint-shutdown
 #    echo 'pi ALL=NOPASSWD: /usr/sbin/service' | sudo tee -a /etc/sudoers.d/octoprint-service
@@ -119,6 +124,7 @@ EOT
 }
 
 function reverse_proxy() {
+  INFO 'Configuring reverse proxy...'
   sudo apt install haproxy
   sudo tee -a /etc/haproxy/haproxy.cfg > /dev/null <<EOT
 
@@ -141,6 +147,7 @@ EOT
 # Enable OctoPrint, Webcam services
 # Start Reverse Proxy, OctoPrint, and Webcam services
 function start_services() {
+  INFO 'Refreshing/Restarting services...'
   sudo systemctl daemon-reload
   sudo systemctl enable octoprint.service
   sudo systemctl enable webcamd.service
