@@ -54,14 +54,14 @@ function install_packages() {
   INFO "Installing necessary packages..."
   INFO "Python version: $(python3 --version)"
   # Python3 + Virtual Environment Support
-  py_pkg="python3-pip python3-dev python3-setuptools python3-venv git libyaml-dev build-essential"
+  # py_pkg="python3-pip python3-dev python3-setuptools python3-venv git libyaml-dev build-essential"
   # Webcam support
   # Removed - subversion
-  webcam_pkg="libjpeg-dev imagemagick ffmpeg libv4l-dev cmake v4l-utils"
+  # webcam_pkg="libjpeg-dev imagemagick ffmpeg libv4l-dev cmake v4l-utils"
   # Reverse Proxy support
-  proxy_pkg="haproxy"
+  # proxy_pkg="haproxy"
 
-  sudo apt install "$py_pkg $webcam_pkg $proxy_pkg"
+  sudo apt install python3-pip python3-dev python3-setuptools python3-venv git libyaml-dev build-essential libjpeg-dev imagemagick ffmpeg libv4l-dev cmake v4l-utils haproxy
 }
 
 # Downloads service scripts and moves them to their appropriate destinations
