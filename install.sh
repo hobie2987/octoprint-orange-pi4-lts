@@ -53,15 +53,12 @@ function pi_user() {
 function install_packages() {
   INFO "Installing necessary packages..."
   INFO "Python version: $(python3 --version)"
-  # Python3 + Virtual Environment Support
-  # py_pkg="python3-pip python3-dev python3-setuptools python3-venv git libyaml-dev build-essential"
+  # Python3 + VEnv Support
+  sudo apt install python3-pip python3-dev python3-setuptools python3-venv git libyaml-dev build-essential
   # Webcam support
-  # Removed - subversion
-  # webcam_pkg="libjpeg-dev imagemagick ffmpeg libv4l-dev cmake v4l-utils"
+  sudo apt install libjpeg-dev imagemagick ffmpeg libv4l-dev cmake v4l-utils
   # Reverse Proxy support
-  # proxy_pkg="haproxy"
-
-  sudo apt install python3-pip python3-dev python3-setuptools python3-venv git libyaml-dev build-essential libjpeg-dev imagemagick ffmpeg libv4l-dev cmake v4l-utils haproxy
+  sudo apt install haproxy
 }
 
 # Downloads service scripts and moves them to their appropriate destinations
@@ -95,7 +92,7 @@ function webcam_support() {
   git clone https://github.com/jacksonliam/mjpg-streamer.git "$MJPG_STREAMER_DIR"
   cd "$MJPG_STREAMER_DIR/mjpg-streamer-experimental"
   export LD_LIBRARY_PATH=.
-  sudo make install
+  sudo make
 }
 
 # Remove sudo password requirements for user pi
