@@ -1,56 +1,49 @@
 #!/bin/bash
 
-VIDEO_DEVICE="/dev/video5"
-MJPGSTREAMER_HOME=/home/pi/mjpg-streamer/mjpg-streamer-experimental
-MJPGSTREAMER_INPUT_USB="input_uvc.so -d $VIDEO_DEVICE"
-MJPGSTREAMER_INPUT_RASPICAM="input_raspicam.so"
+# VIDEO DEVICE CONFIGURATION
+# - Grab first devname of detected webcam device
+VIDEO_DEVICE=$(v4l2-ctl --list-devices | grep -om 1 "/dev/video[0-9]")
+VIDEO_MODEL=$(udevadm info --query=property --name="$VIDEO_DEVICE" | grep  "ID_MODEL=" | cut -d = -f 2)
+#TODO - Dynamically populate resolution and frame rate
+VIDEO_RESOLUTION="1920x1080"
+VIDEO_FRAME_RATE="30"
 
-# init configuration
-camera="auto"
-camera_usb_options="-r 1920x1080 -f 30"
-camera_raspi_options="-fps 10"
+# MJPG STREAMER SETTINGS
+STREAMER_HOME=/home/pi/mjpg-streamer/mjpg-streamer-experimental
+INPUT_OPTIONS="input_uvc.so -d $VIDEO_DEVICE -r $VIDEO_RESOLUTION -f $VIDEO_FRAME_RATE"
+OUTPUT_OPTIONS="output_http.so -w ./www"
 
-if [ -e "/boot/octopi.txt" ]; then
-    source "/boot/octopi.txt"
-fi
-
-# runs MJPG Streamer, using the provided input plugin + configuration
-function runMjpgStreamer {
-    input=$1
-    pushd $MJPGSTREAMER_HOME
-    echo Running ./mjpg_streamer -o "output_http.so -w ./www" -i "$input"
-    LD_LIBRARY_PATH=. ./mjpg_streamer -o "output_http.so -w ./www" -i "$input"
-    popd
-}
-
-# starts up the RasPiCam
-function startRaspi {
-    logger "Starting Raspberry Pi camera"
-    runMjpgStreamer "$MJPGSTREAMER_INPUT_RASPICAM $camera_raspi_options"
+function log_config() {
+  echo "**************************************"
+  echo "*       Starting USB webcam          *"
+  echo "**************************************"
+  echo "Device Model: $VIDEO_MODEL"
+  echo "Device Name: $VIDEO_DEVICE"
+  echo "Resolution: $VIDEO_RESOLUTION"
+  echo "Frame Rate: $VIDEO_FRAME_RATE fps"
+  echo "MJPG Streamer Home: $STREAMER_HOME"
+  echo "Input: $INPUT_OPTIONS"
+  echo "Output: $OUTPUT_OPTIONS"
+  echo "Running: ./mjpg_streamer -i $INPUT_OPTIONS -o $OUTPUT_OPTIONS"
+  echo "**************************************"
 }
 
 # starts up the USB webcam
-function startUsb {
-    logger "Starting USB webcam"
-    runMjpgStreamer "$MJPGSTREAMER_INPUT_USB $camera_usb_options"
+function start_usb_webcam() {
+  pushd $STREAMER_HOME || exit 2
+  LD_LIBRARY_PATH=. ./mjpg_streamer -i "$INPUT_OPTIONS" -o "$OUTPUT_OPTIONS"
+  popd  || exit 3
 }
-
-# we need this to prevent the later calls to vcgencmd from blocking
-# I have no idea why, but that's how it is...
-vcgencmd version
-
-# echo configuration
-echo camera: $camera
-echo usb options: $camera_usb_options
-echo raspi options: $camera_raspi_options
 
 # keep mjpg streamer running if some camera is attached
 while true; do
-    if [ -e "$VIDEO_DEVICE" ] && { [ "$camera" = "auto" ] || [ "$camera" = "usb" ] ; }; then
-        startUsb
-    elif [ "`vcgencmd get_camera`" = "supported=1 detected=1" ] && { [ "$camera" = "auto" ] || [ "$camera" = "raspi" ] ; }; then
-        startRaspi
-    fi
-
-    sleep 120
+ log_config
+ if [ -e "$VIDEO_DEVICE" ] ; then
+   start_usb_webcam
+ else
+   echo "$VIDEO_DEVICE not found"
+   exit 1
+ fi
+ # sleep 2 minutes
+ sleep 120
 done
