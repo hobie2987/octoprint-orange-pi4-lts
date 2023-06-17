@@ -2,12 +2,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [TBD]
+## [2023-06-17]
 ### Summary
-Enhancements to webcamd Webcam startup script
-### Changed
-- Validate correct Webcam devname is selected
-- Auto-detect webcam resolution and framerate
+Enhancements to webcamd startup script
+
+### Added
+- 1 minute poll to detect webcam
+- Auto-detect webcam device (ex: /dev/video0)
+- Auto-detect webcam resolution
+- Auto-detect webcam resolution
 ---
 
 ## [2023-06-14]
@@ -15,8 +18,8 @@ Enhancements to webcamd Webcam startup script
 Script optimization/cleanup and support for Orange Pi 5/5B (Debian)!
 
 ### Added
-- Use /home/pi/tmp directory to for services and scripts.
-- Install v4l-utils package
+- Use /home/pi/tmp directory to initially store services and scripts.
+- Install v4l-utils package for webcam discovery
 - Auto-detect USB Webcam devname in webcamd script
 - Prompt user to reboot
 ### Changed
@@ -43,7 +46,7 @@ Script optimization/cleanup and support for Orange Pi 5/5B (Debian)!
 ---
 
 ## [2022-07-28]
-### Fixed
+### Fix-d
 - Add pi user to tty and dialout groups
 ---
 

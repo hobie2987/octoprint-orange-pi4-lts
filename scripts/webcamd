@@ -1,49 +1,120 @@
 #!/bin/bash
 
+########################################################################################
 # VIDEO DEVICE CONFIGURATION
-# - Grab first devname of detected webcam device
-VIDEO_DEVICE=$(v4l2-ctl --list-devices | grep -om 1 "/dev/video[0-9]")
-VIDEO_MODEL=$(udevadm info --query=property --name="$VIDEO_DEVICE" | grep  "ID_MODEL=" | cut -d = -f 2)
-#TODO - Dynamically populate resolution and frame rate
-VIDEO_RESOLUTION="1920x1080"
-VIDEO_FRAME_RATE="30"
+# VIDEO_DEVICE=/dev/video0
+# VIDEO_RESOLUTION="1920x1080"
+# VIDEO_FRAMERATE="30"
 
 # MJPG STREAMER SETTINGS
 STREAMER_HOME=/home/pi/mjpg-streamer/mjpg-streamer-experimental
-INPUT_OPTIONS="input_uvc.so -d $VIDEO_DEVICE -r $VIDEO_RESOLUTION -f $VIDEO_FRAME_RATE"
-OUTPUT_OPTIONS="output_http.so -w ./www"
+########################################################################################
 
-function log_config() {
+# Detects the device name of the webcam.
+# v4l2-ctl --list-devices
+#   /dev/video0
+#   /dev/video1
+#   /dev/media0
+# Pipe: | grep -om 1 "/dev/video[0-9]"
+# /dev/video0
+function device_name() {
+  v4l2-ctl --list-devices | grep -om 1 "/dev/video[0-9]"
+}
+
+# Detects the model of the webcam
+# udevadm info --query=property --name=/dev/video0 | grep "ID_MODEL="
+#   ID_MODEL=NexiGo_N930E_FHD_Webcam
+# Pipe: | cut -d = -f 2
+#   NexiGo_N930E_FHD_Webcam
+function device_model() {
+  udevadm info --query=property --name="$(device_name)" | grep "ID_MODEL=" | cut -d = -f 2
+}
+
+# Gets the highest camera resolution for MJPG (always last resolution listed)
+# v4l2-ctl -d /dev/video0 --list-framesizes=MJPG
+#   ioctl: VIDIOC_ENUM_FRAMESIZES
+#        Size: Discrete 640x480
+#        Size: Discrete 320x240
+#        Size: Discrete 800x600
+#        Size: Discrete 1280x720
+#        Size: Discrete 1280x960
+#        Size: Discrete 1920x1080
+# Pipe: | grep -o "[0-9]*x[0-9]*" | tail -1
+#   1920x1080
+function device_resolution() {
+  v4l2-ctl -d "$(device_name)" --list-framesizes=MJPG | grep -o "[0-9]*x[0-9]*" | tail -1
+}
+
+# Gets best (first) framerate for the best resolution option
+# v4l2-ctl -d /dev/video0 --list-frameintervals=width=1920,height=1080,pixelformat=MJPG
+#   ioctl: VIDIOC_ENUM_FRAMEINTERVALS
+#        Interval: Discrete 0.033s (30.000 fps)
+#        Interval: Discrete 0.040s (25.000 fps)
+#        Interval: Discrete 0.050s (20.000 fps)
+# Pipe: | egrep -om 1 "[[:digit:]]*.[[:digit:]]* fps"
+#   30.000 fps
+# Pipe: | egrep -o -E -m 1 "[[:digit:]]{2}" | head -1
+#   30
+function device_framerate() {
+  # starr = "1920x1080".split("x") => [1920,1080]
+  readarray -d x -t strarr <<< "$(device_resolution)"
+  v4l2-ctl -d "$(device_name)" --list-frameintervals=width="${strarr[0]}",height="${strarr[1]}",pixelformat=MJPG | egrep -om 1 "[[:digit:]]*.[[:digit:]]* fps" | egrep -o -E -m 1 "[[:digit:]]{2}" | head -1
+}
+
+function log_device() {
   echo "**************************************"
-  echo "*       Starting USB webcam          *"
+  echo "*       Detected USB webcam          *"
   echo "**************************************"
-  echo "Device Model: $VIDEO_MODEL"
-  echo "Device Name: $VIDEO_DEVICE"
-  echo "Resolution: $VIDEO_RESOLUTION"
-  echo "Frame Rate: $VIDEO_FRAME_RATE fps"
+  echo "Device Model: $(device_model)"
+  echo "Device Name: $(device_name)"
+  echo "Resolution: $(device_resolution)"
+  echo "Frame Rate (FPS): $(device_framerate)"
   echo "MJPG Streamer Home: $STREAMER_HOME"
-  echo "Input: $INPUT_OPTIONS"
-  echo "Output: $OUTPUT_OPTIONS"
-  echo "Running: ./mjpg_streamer -i $INPUT_OPTIONS -o $OUTPUT_OPTIONS"
   echo "**************************************"
+}
+
+# Polls ever 2 seconds for webcam to become available
+# If not found after 1 minute, script exits
+function detect_webcam() {
+  counter=0
+  webcam=$(device_name)
+
+  # Loop 6 times polling for device_name
+  while [ ! -e "$webcam" ] && [ $counter -lt 30 ]; do
+    webcam=$(device_name)
+    counter=$((counter + 1))
+    echo "$counter => $([ -e "$webcam" ] && echo "$webcam" || echo "Webcam not detected")"
+    sleep 2
+  done
+
+  # If device cannot be found exit;
+  if [ ! -e "$webcam" ]; then
+    echo "Webcam could not detected... Exit(1)"
+    exit 2
+  else
+    log_device
+  fi
 }
 
 # starts up the USB webcam
+# While Webcam still exists, keep it running.
+# Rechecks to ensure camera is still connected every 2 minutes
 function start_usb_webcam() {
-  pushd $STREAMER_HOME || exit 2
-  LD_LIBRARY_PATH=. ./mjpg_streamer -i "$INPUT_OPTIONS" -o "$OUTPUT_OPTIONS"
-  popd  || exit 3
+  VIDEO_DEVICE=$(device_name)
+  INPUT_OPTIONS="input_uvc.so -d $VIDEO_DEVICE -r $(device_resolution) -f $(device_framerate)}"
+  OUTPUT_OPTIONS="output_http.so -w ./www"
+
+  while [ -e "$VIDEO_DEVICE" ]; do
+    cd $STREAMER_HOME || exit 2
+    echo "Running: ./mjpg_streamer -i $INPUT_OPTIONS -o $OUTPUT_OPTIONS"
+    LD_LIBRARY_PATH=. ./mjpg_streamer -i "$INPUT_OPTIONS" -o "$OUTPUT_OPTIONS"
+    # sleep 2 minutes
+    sleep 120
+  done
+
+  echo "Webcam device not detected at $VIDEO_DEVICE... Exit(3)"
+  exit 3
 }
 
-# keep mjpg streamer running if some camera is attached
-while true; do
- log_config
- if [ -e "$VIDEO_DEVICE" ] ; then
-   start_usb_webcam
- else
-   echo "$VIDEO_DEVICE not found"
-   exit 1
- fi
- # sleep 2 minutes
- sleep 120
-done
+detect_webcam
+start_usb_webcam
