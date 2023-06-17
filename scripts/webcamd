@@ -101,7 +101,7 @@ function detect_webcam() {
 # Rechecks to ensure camera is still connected every 2 minutes
 function start_usb_webcam() {
   VIDEO_DEVICE=$(device_name)
-  INPUT_OPTIONS="input_uvc.so -d $VIDEO_DEVICE -r $(device_resolution) -f $(device_framerate)}"
+  INPUT_OPTIONS="input_uvc.so -d $VIDEO_DEVICE -r $(device_resolution) -f $(device_framerate)"
   OUTPUT_OPTIONS="output_http.so -w ./www"
 
   while [ -e "$VIDEO_DEVICE" ]; do
