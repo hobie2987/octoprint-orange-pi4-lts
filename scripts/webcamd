@@ -10,15 +10,19 @@
 STREAMER_HOME=/home/pi/mjpg-streamer/mjpg-streamer-experimental
 ########################################################################################
 
-# Detects the device name of the webcam.
-# v4l2-ctl --list-devices
-#   /dev/video0
-#   /dev/video1
-#   /dev/media0
-# Pipe: | grep -om 1 "/dev/video[0-9]"
-# /dev/video0
+# Detects the device name of the webcam. Identifies all video devices
+# and identifies the one with Video Capture capabilities
 function device_name() {
-  v4l2-ctl --list-devices | grep -om 1 "/dev/video[0-9]"
+  # v4l2-ctl --list-devices | grep -om 1 "/dev/video[0-9]"
+  str=$(v4l2-ctl --list-devices | grep -o "/dev/video[0-9]")
+  devices=($str)
+  for d in "${devices[@]}"; do
+    vc=$(v4l2-ctl -d "$d" -D | grep -om1 "Video Capture")
+    if [ "$vc" != "" ]; then
+          echo "$d"
+          break;
+    fi
+  done
 }
 
 # Detects the model of the webcam
