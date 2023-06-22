@@ -2,6 +2,19 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2023-06-22]
+### Summary
+Enhancements to install and webcamd startup script
+
+### Added
+- Install supporting usb_webcam.sh script
+- Validate valid resolution and framerate
+- Add -y option for apt install, update, and upgrade
+
+### Changed
+- Flatten webcamd script
+---
+
 ## [2023-06-17]
 ### Summary
 Enhancements to webcamd startup script
