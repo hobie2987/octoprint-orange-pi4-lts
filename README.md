@@ -1,4 +1,4 @@
-# OctoPrint Installer for Orange Pi (OPi) 4 LTS #
+# OctoPrint Installer for Orange Pi (OPi) 4 LTS & 5B #
 
 As we all know, Raspberry Pi's are hard to come by, and if you do find one, it comes with a ridiculous price tag.  I was
 faced with this issue, so I sought out and alternate solution and purchased an Orange Pi 4 LTS board.  After purchasing,
@@ -8,38 +8,51 @@ documenting the process in depth so others do not make the same mistake, I inste
 and automation reduces the chances of making a mistake, causing you to restart the whole process over. 
 
 ## Requirements ##
-- Orange Pi 4 LTS
-  - Verified on the following versions
+- Orange Pi 
+  - 4 LTS - Verified on the following versions
     - 4 GB RAM + 16 GB EMMC Flash storage
     - 3 GB RAM + Empty EMMC
-- 8+ GB microSD card
-  - I recommend Sandisk Ultra series (32GB)
-    - https://www.amazon.com/dp/B08GY9NYRM
-- Fresh installation of Armbian on microSD card
-  - Installation IMG files can be downloaded from here: https://www.armbian.com/orange-pi-4-lts/
-  - IMG files can be installed on a microSD card using balenaEtcher
-    - https://www.balena.io/etcher/
+  - 5B - Verified on the following version
+    - 8 GB RAM + 64 GB EMMC Flash storage
+- 32+ GB microSD card
+  - I recommend Sandisk Extreme series (32GB)
+    - https://www.amazon.com/dp/B06XWMQ81P
+- Debian Installation Image
+  - 4LTS - http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/service-and-support/Orange-pi-4-LTS.html
+  - 5B - http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/service-and-support/Orange-Pi-5B.html
+- IMG files can be installed on a microSD card using balenaEtcher
+  - https://www.balena.io/etcher/
 
 ## Installation instructions ##
-- Extract the Armbian installation image from the downloaded archive file
-- Install Armbian on your microSD card with balenaEtcher, and insert it into the side of the OPi4 board
+- Extract the installation image from the downloaded archive file
+- Install it on your microSD card with balenaEtcher, and insert it into the side of the OPi4 board
 - Plug in your USB webcam, mouse and keyboard
-- The OPi4 LTS board is equipped with WiFi, so have your network password on hand, or plug it in directly to ethernet
-- Connect the OPi4 board to a display via an HDMI cable
-- Finally, plug in the 5v power adapter to power on the device
+- The OPi4 LTS and 5B boards are equipped with WiFi, so have your network password on hand, or plug it in directly to ethernet
+- Connect the OPi board to a display via an HDMI cable
+- Finally, plug in the 5v/4 amp power adapter to power on the device
 
 ### Once the OPi4 board has completed booting, perform the following actions: ###
-- Create a password for root, and confirm password
-- Select your default shell
-  - Press 1 for "bash"
-- You will then be prompted to create a new sudo user. Use the following credentials
-  - User Name: pi (all lowercase)
-  - Password: your choice, but use something you'll remember
-- Select your Wifi network (if applicable)
-  - Select the SSID for your network
-  - Enter the password/passphrase, use the down arrow and press ENTER on OK
-  - Using your arrow keys, press right and then down to highlight "Quit", and hit Enter
-- Select Language and Locale
+- Type the following in your console
+```bash
+sudo orangepi-config
+```
+- Select your wifi network
+- Select your timezone
+- Optional, but recommended: 
+  - Set your hostname
+  - Set a static IP
+
+- Type the following commands in the terminal to update your system:
+  - If you are prompted for a password, enter: orangepi
+```bash
+sudo apt update
+sudo apt -y upgrade
+```
+- Reboot your device with the following commmand
+```bash
+sudo shutdown now -r
+```
+
 - Type (or copy and paste) each of the commands below into the terminal, one by one, and pressing the Enter key on your 
 keyboard to submit the command.
 
@@ -124,31 +137,39 @@ providing system command and URL's for your webcam.  Use the values provided bel
 
 ## Adjusting webcam resolution and framerate ##
 
-The webcam auto-start script has a hard coded value of 1080p/30fps resolution/framerate, which might not be compatible with 
-your webcam and could prevent your streaming services from starting properly.
-```bash
-camera_usb_options="-r 1920x1080 -f 30"
+The webcam auto-start script will auto-detect the webcam device (/dev/video*), resolution and framerate.  This is done 
+through a series of v4l2-ctl and udevadm commands to identify which /dev/video* device meets the following criteria.
 ```
-If this is not the correct resolution or framerate for your webcam, you can update the script with the correct ones by 
-doing the following:
-
-```bash
-$ sudo su pi
-$ sudo nano /home/pi/scripts/webcamd
+ID_BUS=usb
+ID_TYPE=video
+ID_V4L_CAPABILITIES=:capture:
 ```
 
-This will enter the Nano editor, for modifying the script.  Use the arrow keys on your keyboard to navigate to the 
-"camera_usb_options=" line and update the resolution and framerate to what you desire.  For example, to switch to 
-720p/25fps:
+This does add some overhead, but can be beneficial if your webcam devname changes every time the Opi is rebooted.  If 
+you find that your webcam settings are consistent, you can edit the webcamd script to set the following 
+variables to bypass the auto-detection logic:
+
 ```bash
-camera_usb_options="-r 1280x720 -f 25"
+sudo nano /home/pi/scripts/webcamd
 ```
+
+Then set the following configuration variables
+
+```bash
+VIDEO_DEVICE=/dev/video0
+VIDEO_RESOLUTION=1920x1080
+VIDEO_FRAMERATE=30
+```
+
 Once you update the script, enter the following key combinations to save the change and exit out of the Nano editor
 - Ctrl + X
 - Y - Confirms save changes
 - Enter
 
-Once that change is made, in your terminal, run the following command to stop and restart your webcam service.
+The script will ensure the provided resolution and framerate are supported.  If an unsupported resolution or framerate 
+is supplied, the script will automatically apply the MAX resolution and framerate supported by the camera.
+
+To restart your webcam device, run the following commands in your terminal restart your webcam service.
 ```bash
 sudo systemctl stop webcamd
 sudo systemctl start webcamd
