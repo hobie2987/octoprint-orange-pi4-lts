@@ -72,7 +72,8 @@ function install_services() {
   INFO 'Installing Webcam auto-start scripts...'
   wget https://raw.githubusercontent.com/hobie2987/octoprint-orange-pi4-lts/main/scripts/webcamd && sudo mv webcamd "$WEBCAM_DAEMON"
   wget https://raw.githubusercontent.com/hobie2987/octoprint-orange-pi4-lts/main/scripts/usb_webcam.sh && sudo mv usb_webcam.sh "$SCRIPTS_DIR/usb_webcam.sh"
-  sudo chmod +x "$SCRIPTS_DIR/*"
+  cd "$SCRIPTS_DIR"
+  sudo chmod +x *
 #  sudo chmod +x "$WEBCAM_DAEMON"
 #  sudo chmod +x "$SCRIPTS_DIR/usb_webcam.sh"
 }
