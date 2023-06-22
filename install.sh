@@ -27,8 +27,8 @@ function ERROR() {
 # Run system Updates/Upgrades
 function sys_update() {
   INFO 'Lets make sure your system is updated, shall we?...'
-  sudo apt update
-  sudo apt upgrade
+  sudo apt -y update
+  sudo apt -y upgrade
 }
 
 # Creates user "pi",
@@ -54,11 +54,11 @@ function install_packages() {
   INFO "Installing necessary packages..."
   INFO "Python version: $(python3 --version)"
   # Python3 + VEnv Support
-  sudo apt install python3-pip python3-dev python3-setuptools python3-venv git libyaml-dev build-essential
+  sudo apt -y install python3-pip python3-dev python3-setuptools python3-venv git libyaml-dev build-essential
   # Webcam support
-  sudo apt install libjpeg-dev imagemagick ffmpeg libv4l-dev cmake v4l-utils
+  sudo apt -y install libjpeg-dev imagemagick ffmpeg libv4l-dev cmake v4l-utils
   # Reverse Proxy support
-  sudo apt install haproxy
+  sudo apt -y install haproxy
 }
 
 # Downloads service scripts and moves them to their appropriate destinations
@@ -71,7 +71,10 @@ function install_services() {
   wget https://raw.githubusercontent.com/hobie2987/octoprint-orange-pi4-lts/main/services/webcamd.service && sudo mv webcamd.service /etc/systemd/system/webcamd.service
   INFO 'Installing Webcam auto-start scripts...'
   wget https://raw.githubusercontent.com/hobie2987/octoprint-orange-pi4-lts/main/scripts/webcamd && sudo mv webcamd "$WEBCAM_DAEMON"
-  sudo chmod +x "$WEBCAM_DAEMON"
+  wget https://raw.githubusercontent.com/hobie2987/octoprint-orange-pi4-lts/main/scripts/usb_webcam.sh && sudo mv usb_webcam.sh "$SCRIPTS_DIR/usb_webcam.sh"
+  sudo chmod +x "$SCRIPTS_DIR/*"
+#  sudo chmod +x "$WEBCAM_DAEMON"
+#  sudo chmod +x "$SCRIPTS_DIR/usb_webcam.sh"
 }
 
 # Generate VM for OctoPrint, and install
@@ -148,7 +151,7 @@ function start_services() {
 }
 
 function cleanup() {
-  rm -rf "$TEMP_DIR"
+  sudo rm -rf "$TEMP_DIR"
 }
 
 # Output URLs for OctoPrint and Webcam stream
@@ -189,5 +192,5 @@ webcam_support # Clone MJPG streamer and set LD_LIBRARY_PATH
 set_permissions # Remove sudo password requirement for user PI
 reverse_proxy # Enable OctoPrint on port 80
 start_services # Add and restart Daemons
-cleanup # Delete temp directory
+cleanup # Delete tmp directory, and any other cleanup tasks
 fin # Output OctoPrint/Webcam URLs/config, prompt reboot
