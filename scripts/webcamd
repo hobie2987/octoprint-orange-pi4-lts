@@ -1,5 +1,5 @@
 #!/bin/bash
-source usb_webcam.sh
+source ~/scripts/usb_webcam.sh
 
 ########################## CONFIGURATION #################################################
 VIDEO_DEVICE=
