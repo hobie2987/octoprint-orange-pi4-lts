@@ -1,5 +1,5 @@
 #!/bin/bash
-source ~/scripts/usb_webcam.sh
+source /home/pi/scripts/usb_webcam.sh
 
 ########################## CONFIGURATION #################################################
 VIDEO_DEVICE=
