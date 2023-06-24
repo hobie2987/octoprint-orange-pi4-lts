@@ -17,13 +17,13 @@ fi
 # Identify highest resolution for webcam unless previously provided
 # ex: 1920x1080
 if [ -z "$VIDEO_RESOLUTION" ] && [ -n "$VIDEO_DEVICE" ]; then
-  VIDEO_RESOLUTION=$(webcam.resolutions "$VIDEO_DEVICE" | tail -1)
+  VIDEO_RESOLUTION=$(webcam.max_resolution "$VIDEO_DEVICE")
 fi
 
 # Identify highest framerate for webcam if not previously provided
 # ex: 30.000
 if [ -z "$VIDEO_FRAMERATE" ] && [ -n "$VIDEO_DEVICE" ] && [ -n "$VIDEO_DEVICE" ]; then
-  VIDEO_FRAMERATE=$(webcam.fps "$VIDEO_DEVICE" "$VIDEO_RESOLUTION" | head -1)
+  VIDEO_FRAMERATE=$(webcam.max_fps "$VIDEO_DEVICE" "$VIDEO_RESOLUTION")
 fi
 
 ######################### WAIT FOR WEBCAM  ###############################################
@@ -37,8 +37,6 @@ if [ -z "$VIDEO_DEVICE" ] || [ ! -e "$VIDEO_DEVICE" ]; then
 
     if [ -e "$VIDEO_DEVICE" ]; then
       webcam.info "$VIDEO_DEVICE"
-      VIDEO_RESOLUTION=$(webcam.resolutions "$VIDEO_DEVICE" | tail -1)
-      VIDEO_FRAMERATE=$(webcam.fps "$VIDEO_DEVICE" "$VIDEO_RESOLUTION" | head -1)
     else
       echo "$counter => Webcam not detected"
     fi
@@ -56,14 +54,14 @@ resolutions=$(webcam.resolutions "$VIDEO_DEVICE")
 echo "$VIDEO_DEVICE supported resolutions => $(echo $resolutions)"
 if [ -z "$VIDEO_RESOLUTION" ] || [[ ! "${resolutions[*]}" =~ ${VIDEO_RESOLUTION} ]]; then
   echo "Unsupported Resolution: [$VIDEO_RESOLUTION]"
-  VIDEO_RESOLUTION=$(webcam.resolutions "$VIDEO_DEVICE" | tail -1)
+  VIDEO_RESOLUTION=$(webcam.max_resolution "$VIDEO_DEVICE")
 fi
 
 frame_rates=$(webcam.fps "$VIDEO_DEVICE" "$VIDEO_RESOLUTION")
 echo "$VIDEO_DEVICE supported fps @[$VIDEO_RESOLUTION] => $(echo $frame_rates)"
 if [ -z "$VIDEO_FRAMERATE" ] || [[ ! "${frame_rates[*]}" =~ ${VIDEO_FRAMERATE} ]]; then
   echo "Unsupported Frame Rate: [$VIDEO_FRAMERATE]"
-  VIDEO_FRAMERATE=$(webcam.fps "$VIDEO_DEVICE" "$VIDEO_RESOLUTION" | head -1)
+  VIDEO_FRAMERATE=$(webcam.max_fps "$VIDEO_DEVICE" "$VIDEO_RESOLUTION")
 fi
 
 ######################### START WEBCAM  ##################################################
