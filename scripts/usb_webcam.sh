@@ -30,29 +30,36 @@ function webcam.model() {
 
 # Returns all supported resolutions for the provided device
 # Usage: webcam.resolution /dev/video0
-# Returns: 640x480
-#          320x240
-#          800x600
-#          1280x720
-#          1280x960
-#          1920x1080
+# Returns: (640x480 320x240 800x600 1280x720 1280x960 1920x1080)
 function webcam.resolutions() {
   v4l2-ctl -d "$1" --list-framesizes=MJPG | grep -o "[0-9]*x[0-9]*"
   #| tail -1 => returns last
 }
 
+# Returns the max resolution supported by the webcam
+# Usage: webcam.max_resolution /dev/video0
+# Returns: 1920x1080
+function webcam.max_resolution() {
+  webcam.resolutions "$1" | tail -1;
+}
+
 # Returns all framerate of the request device and resolutions
 # Usage: webcam.fps /dev/video0 1920x1080
-# Returns: 30.000
-#          25.000
-#          20.000
+# Returns: (30.000 25.000 20.000)
 function webcam.fps() {
   readarray -d x -t strarr <<< "$2"
   v4l2-ctl -d "$1" --list-frameintervals=width="${strarr[0]}",height="${strarr[1]}",pixelformat=MJPG | egrep -o "[[:digit:]]{2,}.[[:digit:]]{3,}"
   # | egrep -o -E -m 1 "[[:digit:]]{2}" | head -1
 }
 
-# Prints info for proviced webcam device
+# Returns the max fps supported for the provided resolution
+# Usage: webcam.max_fps /dev/video0 1920x1080
+# Returns: 30.000
+function webcam.max_fps() {
+  webcam.fps "$1" "$2" | head -1;
+}
+
+# Prints info for provided webcam device
 # Usage: webcam.info /dev/video0
 function webcam.info() {
   MAX_RES=$(webcam.resolutions "$1" | tail -1)
