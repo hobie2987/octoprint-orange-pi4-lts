@@ -58,13 +58,16 @@ function webcam.max_fps() {
 # Prints info for provided webcam device
 # Usage: webcam.info /dev/video0
 function webcam.info() {
+  RESOLUTIONS=$(webcam.resolutions "$1")
   MAX_RES=$(webcam.max_resolution "$1")
+  MAX_FPS=$(webcam.max_fps $1 $MAX_RES)
   echo "**************************************"
   echo "*       Detected USB webcam          *"
   echo "**************************************"
   echo "Device Model: $(webcam.model $1)"
   echo "Device Name: $1"
-  echo "Max Resolution: $MAX_RES"
-  echo "Max Frame Rate (FPS): $(webcam.max_fps $1 $MAX_RES)"
+  echo "Max Settings: $MAX_RES @ $MAX_FPS fps"
+  printf "Supported Resolutions:\n\t"
+  echo $RESOLUTIONS
   echo "**************************************"
 }
