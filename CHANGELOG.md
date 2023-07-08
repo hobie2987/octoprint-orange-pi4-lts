@@ -2,6 +2,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2023-07-08]
+
+### Changed
+- List supported resolutions by detected webcam
+- List device details (auto & provided devices)
+- Remove debug echos for resolutions and frame rates
+---
+
 ## [2023-06-22]
 ### Summary
 Enhancements to install and webcamd startup script
