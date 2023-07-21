@@ -22,7 +22,7 @@ fi
 
 # Identify highest framerate for webcam if not previously provided
 # ex: 30.000
-if [ -z "$VIDEO_FRAMERATE" ] && [ -n "$VIDEO_DEVICE" ] && [ -n "$VIDEO_DEVICE" ]; then
+if [ -z "$VIDEO_FRAMERATE" ] && [ -n "$VIDEO_DEVICE" ] && [ -n "$VIDEO_RESOLUTION" ]; then
   VIDEO_FRAMERATE=$(webcam.max_fps "$VIDEO_DEVICE" "$VIDEO_RESOLUTION")
 fi
 
