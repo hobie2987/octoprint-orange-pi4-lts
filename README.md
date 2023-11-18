@@ -1,4 +1,4 @@
-# OctoPrint Installer for Orange Pi (OPi) 4 LTS & 5B #
+# OctoPrint Installer for Orange Pi (OPi) #
 
 As we all know, Raspberry Pi's are hard to come by, and if you do find one, it comes with a ridiculous price tag.  I was
 faced with this issue, so I sought out and alternate solution and purchased an Orange Pi 4 LTS board.  After purchasing,
@@ -7,19 +7,23 @@ attempts of following the Linux install instructions, I finally learned there ar
 documenting the process in depth so others do not make the same mistake, I instead scripted the installation process, 
 and automation reduces the chances of making a mistake, causing you to restart the whole process over. 
 
-## Requirements ##
-- Orange Pi 
-  - 4 LTS - Verified on the following versions
-    - 4 GB RAM + 16 GB EMMC Flash storage
-    - 3 GB RAM + Empty EMMC
-  - 5B - Verified on the following version
-    - 8 GB RAM + 64 GB EMMC Flash storage
+## Tested and Verified Orange Pi models ##
+- Orange Pi 4 LTS
+  - 4 GB RAM + 16 GB EMMC Flash storage - https://www.aliexpress.us/item/3256804167807493.html
+  - 3 GB RAM + Empty EMMC - https://www.aliexpress.us/item/3256804196540484.html
+- Orange Pi  5b
+  - 8 GB RAM + 64 GB EMMC Flash storage https://www.aliexpress.us/item/3256805170151035.html
+- Orange Pi 3b 
+  - 4GB RAM + Empty EMMC - https://www.aliexpress.us/item/3256805733558464.html
+
+## Requirements ## 
 - 32+ GB microSD card
   - I recommend Sandisk Extreme series (32GB)
     - https://www.amazon.com/dp/B06XWMQ81P
-- Debian Installation Image
+- Debian Installation Image (Server Images)
   - 4LTS - http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/service-and-support/Orange-pi-4-LTS.html
   - 5B - http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/service-and-support/Orange-Pi-5B.html
+  - 3B - http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/service-and-support/Orange-Pi-3B.html
 - IMG files can be installed on a microSD card using balenaEtcher
   - https://www.balena.io/etcher/
 
@@ -87,7 +91,7 @@ disable the password requirement for user "pi".
 - Enables all required services and auto-start scripts
 
 Once the script completes successfully, it will display the following message:
-```bash
+```
 'OctoPrint is now installed with webcam support!  Please reboot your system!'
 '-------------------------------------------------------------------------------'
 'OctoPrint is running @: http://192.168.X.X/'
@@ -106,7 +110,8 @@ Once the script completes successfully, it will display the following message:
 ```
 
 Once you see this message, write down the OctoPrint URL, as you will need this for accessing and configuring 
-OctoPrint.  At this time, restart your OPi4 by typing the following into your terminal
+OctoPrint.  The script will prompt you upon completion to restart your OPi by pressing the "R" key, or any other 
+key to exit.  If you choose to exit without restart, you can restart your OPi at any time using the following command:
 
 ```bash
 sudo shutdown -r now
@@ -118,14 +123,6 @@ Once your system has restarted, open a web browser on another computer and enter
 script output.  This should load the OctoPrint setup wizard.  During the setup process, there will be two steps for 
 providing system command and URL's for your webcam.  Use the values provided below:
 
-### Ocotprint Shutdown/Restart commands ###
-- Restart Octoprint
-  - sudo service octoprint restart
-- Restart system:
-  - sudo shutdown -r now
-- Shutdown system:
-  - sudo shutdown -h now
-
 ### Webcam and Timelapse settings ###
 - Stream URL
   - /webcam/?action=stream
@@ -133,7 +130,14 @@ providing system command and URL's for your webcam.  Use the values provided bel
   - http://127.0.0.1:8080/?action=snapshot
 - Path to FFMPEG
   - /usr/bin/ffmpeg
-
+  
+### Ocotprint Shutdown/Restart commands ###
+- Restart Octoprint
+  - sudo service octoprint restart
+- Restart system:
+  - sudo shutdown -r now
+- Shutdown system:
+  - sudo shutdown -h now
 
 ## Adjusting webcam resolution and framerate ##
 
@@ -153,7 +157,7 @@ variables to bypass the auto-detection logic:
 sudo nano /home/pi/scripts/webcamd
 ```
 
-Then set the following configuration variables
+Then populate the following configuration variables at the top of the script with your desired values:
 
 ```bash
 VIDEO_DEVICE=/dev/video0
