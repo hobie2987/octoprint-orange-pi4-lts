@@ -31,7 +31,7 @@ Enhancements to webcamd startup script
 - 1 minute poll to detect webcam
 - Auto-detect webcam device (ex: /dev/video0)
 - Auto-detect webcam resolution
-- Auto-detect webcam resolution
+- Auto-detect webcam framerate
 ---
 
 ## [2023-06-14]
@@ -67,7 +67,7 @@ Script optimization/cleanup and support for Orange Pi 5/5B (Debian)!
 ---
 
 ## [2022-07-28]
-### Fix-d
+### Fixed
 - Add pi user to tty and dialout groups
 ---
 
