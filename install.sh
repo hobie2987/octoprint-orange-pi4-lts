@@ -66,7 +66,7 @@ function install_services() {
   INFO 'Installing Auto-Start Services...'
   cd "$TEMP_DIR"
   INFO 'Installing OctoPrint auto-start scripts...'
-  wget https://github.com/OctoPrint/OctoPrint/raw/master/scripts/octoprint.service && sudo mv octoprint.service /etc/systemd/system/octoprint.service
+  wget https://raw.githubusercontent.com/hobie2987/octoprint-orange-pi4-lts/main/services/octoprint.service && sudo mv octoprint.service /etc/systemd/system/octoprint.service
   INFO 'Installing Webcam auto-start services...'
   wget https://raw.githubusercontent.com/hobie2987/octoprint-orange-pi4-lts/main/services/webcamd.service && sudo mv webcamd.service /etc/systemd/system/webcamd.service
   INFO 'Installing Webcam auto-start scripts...'
