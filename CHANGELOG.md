@@ -2,6 +2,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2025-10-12]
+
+### Changed
+- The ./script directory from Octoprint/main was removed, which resulted in a 
+404 when attempting to retrieve the octoprint.service file. A temporary fix was 
+implemented copy the service file and update the install.sh script to retrieve it from 
+this repository until a more reliable solution can be implemented.
+
 ## [2023-07-08]
 
 ### Changed
