@@ -184,7 +184,7 @@ function fin() {
     fi
 }
 
-sys_update # Run System update/upgrade
+#sys_update # Run System update/upgrade
 install_packages # Install Supporting packages
 pi_user # Create pi user, add user groups, and create required install directories
 install_services # Download auto-start services and scripts
