@@ -3,7 +3,7 @@
 
 HOSTNAME=$(hostname -I | cut -d" " -f1)
 PI_HOME="/home/pi"
-OCTOPRINT_DIR="$PI_HOME/OctoPrint"
+OCTOPRINT_DIR="$PI_HOME/octoprint"
 MJPG_STREAMER_DIR="$PI_HOME/mjpg-streamer"
 SCRIPTS_DIR="$PI_HOME/scripts"
 WEBCAM_DAEMON="$SCRIPTS_DIR/webcamd"
@@ -25,15 +25,15 @@ function ERROR() {
 }
 
 # Run system Updates/Upgrades
-function sys_update() {
-  INFO 'Lets make sure your system is updated, shall we?...'
-  sudo apt -y update
-  sudo apt -y upgrade
-}
+#function sys_update() {
+#  INFO 'Lets make sure your system is updated, shall we?...'
+#  sudo apt -y update
+#  sudo apt -y upgrade
+#}
 
 # Creates user "pi",
 # Assign pi user to groups: sudo, video, tty, & dialout
-# Creates directories /home/pi/[OctoPrint,scripts,mjpg-streamer,tmp]
+# Creates directories /home/pi/[octoprint,scripts,mjpg-streamer,tmp]
 function pi_user() {
   if ! id -u 'pi' >/dev/null 2>&1; then
     INFO 'Creating sudo user: pi...'
